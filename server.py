@@ -1,5 +1,6 @@
 #  coding: utf-8 
 import socketserver
+import os
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -31,8 +32,45 @@ class MyWebServer(socketserver.BaseRequestHandler):
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
-        print ("Got a request of: %s\n" % self.data)
-        self.request.sendall(bytearray("OK",'utf-8'))
+        #print ("Got a request of: %s\n" % self.data)
+        #self.request.sendall(bytearray("OK",'utf-8'))
+
+        converted_data = self.data.decode("utf-8")
+        request = converted_data.split('\r\n')
+        command = request[0].split(' ')
+        source = command[1]
+        
+        if command[0] == 'GET':
+            if "css" not in source and "index.html" not in source:
+                if source[-1] == "/":
+                    source=source+"index.html"
+                else:
+                    self.request.sendall(bytearray("HTTP/1.1 301 Moved Permanently\r\nLocation:" + source +'/' +"\r\n",'utf-8'))
+                    return
+
+            URLpath = "./www"+source
+        else:
+            self.request.sendall(bytearray("HTTP/1.1 405 Method Not Allowed\r\n",'utf-8'))
+            return
+
+        #path_type=''
+        # by now any non html or css sources have been filtered out
+        if ".html" in source:
+            path_type="text/html"
+        elif ".css" in source:
+            path_type="text/css"
+
+        #if path_type!='':
+
+        if os.path.exists(URLpath):
+            file = open(URLpath,'r')
+            data = file.read()
+            self.request.sendall(bytearray('HTTP/1.1 200 OK\r\n'+"Content-Type:" + path_type +"\r\n"  +"\r\n\r\n"+data,'utf-8'))
+            return
+        else:
+            self.request.sendall(bytearray("HTTP/1.1 404 Not Found\r\n",'utf-8'))
+            return
+
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
