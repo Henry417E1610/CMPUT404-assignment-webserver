@@ -1,6 +1,7 @@
 #  coding: utf-8 
 import socketserver
 import os
+import time
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -39,37 +40,52 @@ class MyWebServer(socketserver.BaseRequestHandler):
         request = converted_data.split('\r\n')
         command = request[0].split(' ')
         source = command[1]
+        executing_date = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
+        path_type = "text/html"
         
         if command[0] == 'GET':
             if "css" not in source and "index.html" not in source:
                 if source[-1] == "/":
                     source += "index.html"
                 else:
-                    self.request.sendall(bytearray("HTTP/1.1 301 Moved Permanently\r\nLocation:" + source + '/' + "\r\n",'utf-8'))
+                    temp = "./www" + source + "/index.html"
+                    #print(os.path.abspath(temp))
+                    #print(self.read_fl(os.path.abspath(temp)))
+                    self.request.sendall(bytearray("HTTP/1.1 301 Moved Permanently\r\nLocation:" + source + '/' + "\r\n" + "Content-Type:" + path_type + "\r\n"
+                                                   + "Date: "+ executing_date + "\r\n" + "Connection: close\r\n\r\n",'utf-8'))
                     return
 
             URLpath = "./www" + source
         else:
             # included but not limited to POST PUT DELETE
-            self.request.sendall(bytearray("HTTP/1.1 405 Method Not Allowed\r\n",'utf-8'))
+            self.request.sendall(bytearray("HTTP/1.1 405 Method Not Allowed\r\n" + "Date: " + executing_date + "\r\n\r\n",'utf-8'))
             return
 
-        #path_type=''
         # by now any non html or css sources have been filtered out
-        if ".html" in source:
-            path_type = "text/html"
-        elif ".css" in source:
+        if ".css" in source:
             path_type = "text/css"
 
         #if path_type!='':
 
         if os.path.exists(URLpath):
+            #print(URLpath)
+            #data = self.read_fl(URLpath)
             fl = open(URLpath,'r')
             data = fl.read()
-            self.request.sendall(bytearray('HTTP/1.1 200 OK\r\n'+"Content-Type:" + path_type + "\r\n" + "\r\n\r\n"+ data,'utf-8'))
+            
+            self.request.sendall(bytearray('HTTP/1.1 200 OK\r\n' + "Content-Type:" + path_type + "\r\n" + "Date: " + executing_date + "\r\n"
+                                           + "Content-Length: " + str(len(data)) + "\r\n" + "Connection: close\r\n\r\n" + data,'utf-8'))
         else:
-            self.request.sendall(bytearray("HTTP/1.1 404 Not Found\r\n",'utf-8'))
+            self.request.sendall(bytearray("HTTP/1.1 404 Not Found\r\n" + "Content-Type:" + path_type + "\r\n" + "Date: " + executing_date + "\r\n"
+                                           + "Connection: close\r\n\r\n",'utf-8'))
 
+'''
+    def read_fl(self,URLpath):
+        fl = open(URLpath,'r')
+        data = fl.read()
+        fl.close()
+        return data
+'''
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
