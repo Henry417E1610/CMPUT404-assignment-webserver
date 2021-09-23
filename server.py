@@ -43,33 +43,32 @@ class MyWebServer(socketserver.BaseRequestHandler):
         if command[0] == 'GET':
             if "css" not in source and "index.html" not in source:
                 if source[-1] == "/":
-                    source=source+"index.html"
+                    source += "index.html"
                 else:
-                    self.request.sendall(bytearray("HTTP/1.1 301 Moved Permanently\r\nLocation:" + source +'/' +"\r\n",'utf-8'))
+                    self.request.sendall(bytearray("HTTP/1.1 301 Moved Permanently\r\nLocation:" + source + '/' + "\r\n",'utf-8'))
                     return
 
-            URLpath = "./www"+source
+            URLpath = "./www" + source
         else:
+            # included but not limited to POST PUT DELETE
             self.request.sendall(bytearray("HTTP/1.1 405 Method Not Allowed\r\n",'utf-8'))
             return
 
         #path_type=''
         # by now any non html or css sources have been filtered out
         if ".html" in source:
-            path_type="text/html"
+            path_type = "text/html"
         elif ".css" in source:
-            path_type="text/css"
+            path_type = "text/css"
 
         #if path_type!='':
 
         if os.path.exists(URLpath):
-            file = open(URLpath,'r')
-            data = file.read()
-            self.request.sendall(bytearray('HTTP/1.1 200 OK\r\n'+"Content-Type:" + path_type +"\r\n"  +"\r\n\r\n"+data,'utf-8'))
-            return
+            fl = open(URLpath,'r')
+            data = fl.read()
+            self.request.sendall(bytearray('HTTP/1.1 200 OK\r\n'+"Content-Type:" + path_type + "\r\n" + "\r\n\r\n"+ data,'utf-8'))
         else:
             self.request.sendall(bytearray("HTTP/1.1 404 Not Found\r\n",'utf-8'))
-            return
 
 
 if __name__ == "__main__":
