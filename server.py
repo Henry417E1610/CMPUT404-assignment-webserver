@@ -48,7 +48,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
                 if source[-1] == "/":
                     source += "index.html"
                 else:
-                    temp = "./www" + source + "/index.html"
+                    #temp = "./www" + source + "/index.html"
                     #print(os.path.abspath(temp))
                     #print(self.read_fl(os.path.abspath(temp)))
                     self.request.sendall(bytearray("HTTP/1.1 301 Moved Permanently\r\nLocation:" + source + '/' + "\r\n" + "Content-Type:" + path_type + "\r\n"
@@ -58,7 +58,7 @@ class MyWebServer(socketserver.BaseRequestHandler):
             URLpath = "./www" + source
         else:
             # included but not limited to POST PUT DELETE
-            self.request.sendall(bytearray("HTTP/1.1 405 Method Not Allowed\r\n" + "Date: " + executing_date + "\r\n\r\n",'utf-8'))
+            self.request.sendall(bytearray("HTTP/1.1 405 Method Not Allowed\r\n" + "Date: " + executing_date + "\r\n" + "Connection: close\r\n\r\n",'utf-8'))
             return
 
         # by now any non html or css sources have been filtered out
@@ -72,7 +72,6 @@ class MyWebServer(socketserver.BaseRequestHandler):
             #data = self.read_fl(URLpath)
             fl = open(URLpath,'r')
             data = fl.read()
-            
             self.request.sendall(bytearray('HTTP/1.1 200 OK\r\n' + "Content-Type:" + path_type + "\r\n" + "Date: " + executing_date + "\r\n"
                                            + "Content-Length: " + str(len(data)) + "\r\n" + "Connection: close\r\n\r\n" + data,'utf-8'))
         else:
