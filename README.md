@@ -26,3 +26,14 @@ Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
 collaborators' ccid: jionghao, qd, kanishk
+
+References
+========================
+
+https://www.guru99.com/python-check-if-file-exists.html for checking the existence of the data
+
+https://www.tutorialspoint.com/python/time_strftime.htm and
+
+https://stackabuse.com/how-to-format-dates-in-python/ for adding dates in header
+
+https://github.com/ColeBoytinck/CMPUT404-assignment-webserver/blob/master/server.py
