@@ -26,6 +26,8 @@ compatible) http://docs.python.org/2/library/socketserver.html
 
 ccid: renyu
 
-collaborators' ccid: jionghao, qd
+collaborators' ccid: jionghao, qd, kanishk
 
 reference: https://github.com/Rikyyyyyyyyyy/CMPUT404-assignment-webserver/blob/main/server.py
+
+https://github.com/ColeBoytinck/CMPUT404-assignment-webserver/blob/master/server.py
